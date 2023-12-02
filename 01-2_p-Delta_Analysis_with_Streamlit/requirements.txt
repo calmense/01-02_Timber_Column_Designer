@@ -1,3 +1,4 @@
 streamlit==1.12.0
 plotly==5.6.0
 pandas==1.4.2
+streamlit_plotly_events==0.0.6
