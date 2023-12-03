@@ -40,31 +40,58 @@ st.write("Especially in columns, practically unavoidable imperfections and pre-d
 st.image('Capture.PNG')
 st.subheader('Input Parameters')
 
+# text = st.markdown("f<sub>c0k</sub> [N/mm<sup>2</sup>]", unsafe_allow_html=True)
+
 # class load_duration_class:
 #    def __innit__(self, kled, kmod)
 
-L_kled = ['permanent', 'long-term', 'medium-term', 'short-term', 'instantaneous']
+L_ldc = ['permanent', 'long-term', 'medium-term', 'short-term', 'instantaneous']    # load duration classes
 L_material = ['Timber', 'Steel', 'Concrete']
+
+# system
 L_service_class = [1, 2, 3]
 L_kmod = [[0.6, 0.7, 0.8, 0.9, 1.1], [0.6, 0.7, 0.8, 0.9, 1.1], [0.5, 0.55, 0.65, 0.7, 0.9]]
+
+# glulam timber 
+L_holzart = ['GL24h', 'GL24c', 'GL28h','GL28c', 'GL32h', 'GL32c', 'GL36h', 'GL36c']
+holzarten = ['GL24h', 'GL24c', 'GL28h','GL28c', 'GL32h', 'GL32c', 'GL36h', 'GL36c']
 L_rho_k = [380, 350, 410, 380, 430, 410, 450, 430]
-L_holzart = ['GL24h', 'GL24c', 'GL28h',
-             'GL28c', 'GL32h', 'GL32c', 'GL36h', 'GL36c']
+L_fmk = [28, 29, 30, 31, 32, 33, 34, 35]
+L_fc0k = [38, 39, 40, 41, 42, 43, 44, 45]
+L_E0mean = [8500, 8500, 8500, 41, 42, 43, 44, 45]
 
-d = {'permanent': [0.6, 0.6, 0.5], 'long-term': [0.7, 0.7, 0.55], 'medium-term': [0.8, 0.8, 0.65], 'short-term': [0.9, 0.9, 0.7], 'instantaneous': [1.1, 1.1, 0.9]}
-pd.DataFrame(data=d, index=[1, 2, 3])
+glulam_dict = [{"name": "GL24h", "rho": 380, "fmk": 28,"fck": 38,"E0mean": 8500,},
+               {"name": "GL24c", "rho": 390, "fmk": 29,"fck": 38,"E0mean": 8500},
+               {"name": "GL28h", "rho": 400, "fmk": 30,"fck": 38,"E0mean": 8500,},
+               {"name": "GL28c", "rho": 410, "fmk": 31,"fck": 38,"E0mean": 8500,},
+               {"name": "GL32h", "rho": 420, "fmk": 32,"fck": 38,"E0mean": 8500,},
+               {"name": "GL32c", "rho": 430, "fmk": 33,"fck": 38,"E0mean": 8500,},
+               {"name": "GL36h", "rho": 440, "fmk": 34,"fck": 38,"E0mean": 8500,},
+               {"name": "GL36c", "rho": 450, "fmk": 35,"fck": 38,"E0mean": 8500,}]
 
-#def xlookup(lookup_value, lookup_array, return_array, if_not_found:str = ''):
-#    match_value = return_array.loc[lookup_array == lookup_value]
-#    if match_value.empty:
-#        return f'"{lookup_value}" not found!' if if_not_found == '' else
+# classes
+class glulam:
+    def __init__(self, name, rho, f_mk, f_c0k, E0mean):
+        self.name = name
+        self.rho = rho
+        self.f_mk = f_mk
+        self.f_c0k = f_c0k
+        self.E0mean = E0mean
+
+for i in range(len(L_holzart)):
+    L_holzart[i] = glulam(L_holzart[i], L_rho_k[i], L_fmk[i], L_fc0k[i], L_E0mean[i])
+
+# dictionary
+df_dict = {'permanent': [0.6, 0.6, 0.5], 'long-term': [0.7, 0.7, 0.55], 'medium-term': [0.8, 0.8, 0.65], 'short-term': [0.9, 0.9, 0.7], 'instantaneous': [1.1, 1.1, 0.9]}
+df = pd.DataFrame(data=df_dict, index=[1, 2, 3])
 
 col1, col2, col3, col4, col5 = st.columns(5, gap="small")
 with col1:
     st.write('System')
     bearing = st.selectbox('Bearing', ('pinned', 'fixed'))
     material = st.selectbox('Material', L_material)
-    grade = st.selectbox('Grade', L_holzart)
+    grade = st.selectbox('Grade', holzarten)
+    timber_index = holzarten.index(grade)
     if bearing == "pinned":
         beta = 1.0
     elif bearing == "fixed":
@@ -83,17 +110,12 @@ with col3:
     M_zd = int(st.text_input('Mzd [kNm]', 40))
     
 with col4:
-    st.write('Material Values')
-    f_c0k = int(st.text_input('f_c0k [N/mm2]', 28))
-    f_mk = int(st.text_input('f_myk [N/mm2]', 28))
-    E_0mean = int(st.text_input('E_0mean [N/mm2]', 12500))
-    f_mzk = f_myk = f_mk
-    E_0mean = E_0mean
-    
-with col5:
     st.write('Resistance Values')
-    k_mod = float(st.text_input('k_mod', 0.8))
-    gamma = float(st.text_input('gamma', 1.3))
+    service_c = float(st.selectbox('Service Class', L_service_class))
+    load_duration_c = str(st.selectbox('Load Duration Class', L_ldc))
+    
+    k_mod = float(df.at[service_c, load_duration_c])
+    gamma = 1.3
   
 # Calculation
 ## System
@@ -108,7 +130,7 @@ with col11:
 with col22:
     st.latex("Reduction Factor")
     chi = k_mod/gamma    # Abminderungsbeiwert
-    st.latex(r"\chi=\frac{k_{mod}}{\gamma}=" + str("{:+.2f}".format(chi)))
+    st.latex(r"\chi=\frac{k_{mod}}{\gamma}=" + str("{:.2f}".format(chi)))
     
 with col33:
     st.latex("Predeformation")
@@ -141,6 +163,11 @@ with col222:
 
 with col333:
     st.latex("Strengths")
+
+    f_c0k = L_holzart[timber_index].f_c0k
+    f_mzk = f_myk = L_holzart[timber_index].f_mk
+    E_0mean = L_holzart[timber_index].E0mean
+        
     f_c0d = f_c0k*chi    # $N/mm^2$ - Bemessungswert der Druckfestigkeit
     f_myd = f_myk*chi    # $N/mm^2$ - Bemessungswert der Biegefestigkeit
     f_mzd = f_mzk*chi    # $N/mm^2$ - Bemessungswert der Biegefestigkeit
@@ -167,7 +194,19 @@ if M_yd == 0 or M_zd == 0:
     L_km = [[1,1],[1,1]]
 else:
     L_km = [[1,0.7],[0.7,1]]
-    
+   
+# classes for y and z
+class sec_yz:
+    def __init__(self, direction, width, height, moment, eccentricity, inertia, wxx, ixx):
+        self.direction = direction
+        self.width = width
+        self.height = height
+        self.moment = moment
+        self.eccentricity = eccentricity
+        self.inertia = inertia
+        self.wxx = wxx
+        self.ixx = ixx
+
 # Listen
 L_bh = [[b,h],[h,b],[b,h],[h,b]]
 L_e = [[e_0*1000],[0],[0],[e_0*1000]]
