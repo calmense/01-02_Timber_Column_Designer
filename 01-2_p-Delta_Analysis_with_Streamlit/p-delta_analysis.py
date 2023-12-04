@@ -160,7 +160,6 @@ def p_delta_iteration(no_iteration, L_M, N_ed, l_ef, E_0meand):
     return x, L_e, L_M, e_total, M_total, L_e_total, L_M_total, L_sigma_mIId
 
 def create_st_table(direction, L_e, L_M, L_e_total, L_M_total, n):
-    st.latex(direction)
     
     # plotly tables
     dict_header = {'values': [('Δei', '[mm]'),  ('ΔMi', '[kNm]'), ('∑ei', '[mm]'), ('∑Mi', '[kNm]')],
@@ -173,11 +172,14 @@ def create_st_table(direction, L_e, L_M, L_e_total, L_M_total, n):
                   'font': {'size': 15, 'color': 'white'},
                   'fill_color': ["#0E1117", "#0E1117", "#0E1117"]}
     
-    tabelle = go.Figure(data=[go.Table(header=dict_header, 
+    table = go.Figure(data=[go.Table(header=dict_header, 
                                        cells=dict_cells, 
                                        columnwidth=[40])])
     
-    st.plotly_chart(tabelle)
+    ## Customize layout
+    table.update_layout(title=direction)
+    
+    st.plotly_chart(table)
 
 def create_st_line_chart(direction, x, L_M_total, color, n):
 
@@ -379,11 +381,11 @@ with col2222:
     direction = 'y-Axis (imperfetion)'
     color = 'red'
     
-    for i,n in enumerate(range(2)):
+    for i,n in enumerate(range(2,4)):
         # plotly table
         table = create_st_table(direction, L_e, L_M, L_e_total, L_M_total, n)
         
-    for i,n in enumerate(range(2)):
+    for i,n in enumerate(range(2,4)):
         # plotly line chart
         create_st_line_chart(direction, x, L_M_total, color, n)
     
