@@ -372,22 +372,22 @@ with col1111:
         # plotly table
         table = create_st_table(direction, L_e, L_M, L_e_total, L_M_total, n)
         
-    for i,n in enumerate(range(2)):
-        # plotly line chart
-        create_st_line_chart(direction, x, L_M_total, color, n)
+    #for i,n in enumerate(range(2)):
+    #    # plotly line chart
+    #    create_st_line_chart(direction, x, L_M_total, color, n)
 
 with col2222:
     # input
-    direction = 'y-Axis (imperfetion)'
+    direction = ['y-Axis (imperfetion)', 'z-Axis']
     color = 'red'
     
     for i,n in enumerate(range(2,4)):
         # plotly table
-        table = create_st_table(direction, L_e, L_M, L_e_total, L_M_total, n)
+        table = create_st_table(direction[i], L_e, L_M, L_e_total, L_M_total, n)
         
-    for i,n in enumerate(range(2,4)):
-        # plotly line chart
-        create_st_line_chart(direction, x, L_M_total, color, n)
+    #for i,n in enumerate(range(2,4)):
+    #    # plotly line chart
+    #    create_st_line_chart(direction, x, L_M_total, color, n)
     
 # Results
 st.subheader('Results') 
