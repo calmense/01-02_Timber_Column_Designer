@@ -375,7 +375,7 @@ with col1111:
 
 with col2222:
     # input
-    direction = ['y-Axis (Imperfetion)', 'z-Axis']
+    direction = ['y-Axis', 'z-Axis (Imperfetion)']
     
     for i,n in enumerate(range(2,4)):
         # plotly table
