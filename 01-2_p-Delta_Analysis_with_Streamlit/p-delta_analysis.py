@@ -158,7 +158,45 @@ def p_delta_iteration(no_iteration, L_M, N_ed, l_ef, E_0meand):
         L_sigma_mIId.append(round(sigma_mIId,0))
         
     return x, L_e, L_M, e_total, M_total, L_e_total, L_M_total, L_sigma_mIId
-        
+
+def create_st_table(direction, L_e, L_M, L_e_total, L_M_total, n):
+    st.latex(direction)
+    
+    # plotly tables
+    dict_header = {'values': [('Δei', '[mm]'),  ('ΔMi', '[kNm]'), ('∑ei', '[mm]'), ('∑Mi', '[kNm]')],
+                   'align': 'center', 
+                   'font': {'size': 15, 'color': 'white'}, 
+                   'fill_color': "#262730"}
+    
+    dict_cells = {'values': [L_e[n],  L_M[n], L_e_total[n], L_M_total[n]], 
+                  'height': 30, 
+                  'font': {'size': 15, 'color': 'white'},
+                  'fill_color': ["#0E1117", "#0E1117", "#0E1117"]}
+    
+    tabelle = go.Figure(data=[go.Table(header=dict_header, 
+                                       cells=dict_cells, 
+                                       columnwidth=[40])])
+    
+    st.plotly_chart(tabelle)
+
+def create_st_line_chart(direction, x, L_M_total, color, n):
+
+    # plotly line chart
+    fig = go.Figure(data=go.Scatter(x=x, 
+                                    y=L_M_total[n], 
+                                    mode='lines', 
+                                    name='Line Chart', 
+                                    line=dict(color=color, width=2)))      
+    ## Customize layout
+    fig.update_layout(
+        title=direction,
+        xaxis_title='Iteration i',
+        yaxis_title='Moment')
+    
+    ## Display the chart using Streamlit
+    st.plotly_chart(fig)
+    
+    
 ### Instantiation of objects
 section_y = section_yz("y", b, h, M_yd)
 I_y = section_y.moment_of_inertia()    # moment of intertia
@@ -323,24 +361,8 @@ st.subheader('Second Order Theory')
 
 col1111, col2222 = st.columns(2, gap="medium")
 with col1111:
-    st.latex("y-Axis")
-    
-    # plotly tables
-    dict_header = {'values': [('Δey', '[mm]'),  ('ΔMy', '[kNm]'), ('∑ey', '[mm]'), ('∑My', '[kNm]')],
-                   'align': 'center', 
-                   'font': {'size': 15, 'color': 'white'}, 
-                   'fill_color': "#262730"}
-    
-    dict_cells = {'values': [L_e[0],  L_M[0], L_e_total[0], L_M_total[0]], 
-                  'height': 30, 
-                  'font': {'size': 15, 'color': 'white'},
-                  'fill_color': ["#0E1117", "#0E1117", "#0E1117"]}
-    
-    tabelle = go.Figure(data=[go.Table(header=dict_header, 
-                                       cells=dict_cells, 
-                                       columnwidth=[40])])
-    
-    st.plotly_chart(tabelle)
+    # plotly table
+    table = create_st_table('y-Axis', L_e, L_M, L_e_total, L_M_total, 0)
 
     # plotly line chart
     fig = go.Figure(data=go.Scatter(x=x, 
