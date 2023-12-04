@@ -361,24 +361,16 @@ st.subheader('Second Order Theory')
 
 col1111, col2222 = st.columns(2, gap="medium")
 with col1111:
+    
+    direction = 'y-Axis'
+    n = 0
+    color = "yellow"
+    
     # plotly table
-    table = create_st_table('y-Axis', L_e, L_M, L_e_total, L_M_total, 0)
+    table = create_st_table(direction, L_e, L_M, L_e_total, L_M_total, 0)
 
     # plotly line chart
-    fig = go.Figure(data=go.Scatter(x=x, 
-                                    y=L_M_total[0], 
-                                    mode='lines', 
-                                    name='Line Chart', 
-                                    line=dict(color='red', width=2)))
-    
-    ## Customize layout
-    fig.update_layout(
-        title='y-Axis',
-        xaxis_title='Iteration i',
-        yaxis_title='Moment')
-    
-    ## Display the chart using Streamlit
-    st.plotly_chart(fig)
+    create_st_line_chart(direction, x, L_M_total, color, n)
     
 with col2222:
     st.latex("z-Axis")
