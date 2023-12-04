@@ -361,27 +361,29 @@ st.subheader('Second Order Theory')
 col1111, col2222 = st.columns(2, gap="medium")
 with col1111:
     # input
-    direction = 'y-Axis'
-    color = "yellow"
+    direction = ['y-Axis (imperfetion)', 'z-Axis']
+    color = ['red', 'white']
     
-    for n in range(2):
+    for i,n in enumerate(range(2)):
         # plotly table
-        table = create_st_table(direction, L_e, L_M, L_e_total, L_M_total, n)
-    
+        table = create_st_table(direction[i], L_e, L_M, L_e_total, L_M_total, n)
+        
+    for i,n in enumerate(range(2)):
         # plotly line chart
-        create_st_line_chart(direction, x, L_M_total, color, n)
-    
+        create_st_line_chart(direction, x, L_M_total, color[i], n)
+
 with col2222:
     # input
-    direction = 'z-Axis'
-    color = "blue"
+    direction = ['y-Axis', 'z-Axis (imperfetion)']
+    color = ['white', 'yellow']
     
-    for n in range(2,4):
+    for i,n in enumerate(range(2,4)):
         # plotly table
-        table = create_st_table(direction, L_e, L_M, L_e_total, L_M_total, n)
-    
+        table = create_st_table(direction[i], L_e, L_M, L_e_total, L_M_total, n)
+        
+    for i,n in enumerate(range(2,4)):
         # plotly line chart
-        create_st_line_chart(direction, x, L_M_total, color, n)
+        create_st_line_chart(direction, x, L_M_total, color[i], n)
     
 # Results
 st.subheader('Results') 
