@@ -363,14 +363,11 @@ st.subheader('Second Order Theory')
 col1111, col2222 = st.columns(2, gap="medium")
 with col1111:
     # input
-    direction = ['y-Axis (imperfetion)', 'z-Axis']
-    color = ['red', 'white']
-    direction = 'y-Axis (imperfetion)'
-    color = 'red'
+    direction = ['y-Axis (Imperfetion)', 'z-Axis']
     
     for i,n in enumerate(range(2)):
         # plotly table
-        table = create_st_table(direction, L_e, L_M, L_e_total, L_M_total, n)
+        table = create_st_table(direction[i], L_e, L_M, L_e_total, L_M_total, n)
         
     #for i,n in enumerate(range(2)):
     #    # plotly line chart
@@ -378,8 +375,7 @@ with col1111:
 
 with col2222:
     # input
-    direction = ['y-Axis (imperfetion)', 'z-Axis']
-    color = 'red'
+    direction = ['y-Axis (Imperfetion)', 'z-Axis']
     
     for i,n in enumerate(range(2,4)):
         # plotly table
