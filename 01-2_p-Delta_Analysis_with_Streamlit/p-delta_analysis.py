@@ -305,7 +305,6 @@ sigma_mz2d_imp = L_sigma_mIId[1][1]
 eta_y = (sigma_cd/(f_c0d*1000))**2 + k_m1*sigma_my2d_imp/(f_myd*1000) + k_m2*sigma_mz2d/(f_mzd*1000)
 eta_z = (sigma_cd/(f_c0d*1000))**2 + k_m3*sigma_y2d/(f_myd*1000)  + k_m4*sigma_mz2d_imp/(f_mzd*1000)
 
-
 ## System
 st.subheader('System')
 col11, col22, col33, col44 = st.columns(4, gap="small")
@@ -361,52 +360,28 @@ st.subheader('Second Order Theory')
 
 col1111, col2222 = st.columns(2, gap="medium")
 with col1111:
-    
+    # input
     direction = 'y-Axis'
-    n = 0
     color = "yellow"
     
-    # plotly table
-    table = create_st_table(direction, L_e, L_M, L_e_total, L_M_total, 0)
-
-    # plotly line chart
-    create_st_line_chart(direction, x, L_M_total, color, n)
+    for n in range(2):
+        # plotly table
+        table = create_st_table(direction, L_e, L_M, L_e_total, L_M_total, n)
+    
+        # plotly line chart
+        create_st_line_chart(direction, x, L_M_total, color, n)
     
 with col2222:
-    st.latex("z-Axis")
+    # input
+    direction = 'z-Axis'
+    color = "blue"
     
-    # plotly tables
-    dict_header = {'values': [('Δez', '[mm]'),  ('ΔMz', '[kNm]'), ('∑ez', '[mm]'), ('∑Mz', '[kNm]')],
-                   'align': 'center', 
-                   'font': {'size': 15, 'color': 'white'}, 
-                   'fill_color': "#262730"}
+    for n in range(2,4):
+        # plotly table
+        table = create_st_table(direction, L_e, L_M, L_e_total, L_M_total, n)
     
-    dict_cells = {'values': [L_e[1],  L_M[1], L_e_total[1], L_M_total[1]], 
-                  'height': 30, 
-                  'font': {'size': 15, 'color': 'white'},
-                  'fill_color': ["#0E1117", "#0E1117", "#0E1117"]}
-    
-    tabelle = go.Figure(data=[go.Table(header=dict_header, 
-                                       cells=dict_cells, 
-                                       columnwidth=[40])])
-    
-    st.plotly_chart(tabelle)
-
-    # plotly line chart
-    fig = go.Figure(data=go.Scatter(x=x, 
-                                    y=L_M_total[1], 
-                                    mode='lines', 
-                                    name='Line Chart', 
-                                    line=dict(color='blue', width=2)))
-    
-    ## Customize layout
-    fig.update_layout(
-        title='z-Axis',
-        xaxis_title='Iteration i',
-        yaxis_title='Moment')
-    
-    ## Display the chart using Streamlit
-    st.plotly_chart(fig)
+        # plotly line chart
+        create_st_line_chart(direction, x, L_M_total, color, n)
     
 # Results
 st.subheader('Results') 
