@@ -50,10 +50,10 @@ holzarten = ['GL24h', 'GL24c', 'GL28h','GL28c', 'GL32h', 'GL32c', 'GL36h', 'GL36
 L_rhok = [380, 350, 410, 380, 430, 410, 450, 430]
 L_fmk = [28, 29, 30, 31, 32, 33, 34, 35]
 L_fc0k = [38, 39, 40, 41, 42, 43, 44, 45]
-L_E0mean = [8500, 8500, 8500, 41, 42, 43, 44, 45]
+L_E0mean = [8500, 8500, 8500, 8500, 8500, 8500, 8500, 8500]
 
 # Input Parameters
-col1, col2, col3, col4, col5 = st.columns(5, gap="small")
+col1, col2, col3, col4 = st.columns(4, gap="small")
 with col1:
     st.write('System')
     bearing = st.selectbox('Bearing', ('pinned', 'fixed'))
@@ -161,24 +161,29 @@ def p_delta_iteration(no_iteration, L_M, N_ed, l_ef, E_0meand):
 
 def create_st_table(direction, L_e, L_M, L_e_total, L_M_total, n):
     
-    # plotly tables
-    dict_header = {'values': [('Δei', '[mm]'),  ('ΔMi', '[kNm]'), ('∑ei', '[mm]'), ('∑Mi', '[kNm]')],
-                   'align': 'center', 
-                   'font': {'size': 15, 'color': 'white'}, 
-                   'fill_color': "#262730"}
+    # Plotly table
+    dict_header = {
+        'values': [('Δei', '[mm]'), ('ΔMi', '[kNm]'), ('∑ei', '[mm]'), ('∑Mi', '[kNm]')],
+        'align': 'center',
+        'font': {'size': 15, 'color': 'white'},
+        'fill_color': "#262730"
+    }
     
-    dict_cells = {'values': [L_e[n],  L_M[n], L_e_total[n], L_M_total[n]], 
-                  'height': 30, 
-                  'font': {'size': 15, 'color': 'white'},
-                  'fill_color': ["#0E1117", "#0E1117", "#0E1117"]}
+    dict_cells = {
+        'values': [L_e[n], L_M[n], L_e_total[n], L_M_total[n]],
+        'height': 30,
+        'font': {'size': 15, 'color': 'white'},
+        'fill_color': ["#0E1117", "#0E1117", "#0E1117"]
+    }
     
     table = go.Figure(data=[go.Table(header=dict_header, 
-                                       cells=dict_cells, 
-                                       columnwidth=[40])])
+                                     cells=dict_cells)], 
+                                     layout=dict(width=600))  # Adjust width as needed
     
-    ## Customize layout
+    # Customize layout
     table.update_layout(title=direction)
     
+    # Display the table using Streamlit
     st.plotly_chart(table)
 
 def create_st_line_chart(direction, x, L_M_total, color, n):
@@ -307,103 +312,120 @@ sigma_mz2d_imp = L_sigma_mIId[1][1]
 eta_y = (sigma_cd/(f_c0d*1000))**2 + k_m1*sigma_my2d_imp/(f_myd*1000) + k_m2*sigma_mz2d/(f_mzd*1000)
 eta_z = (sigma_cd/(f_c0d*1000))**2 + k_m3*sigma_y2d/(f_myd*1000)  + k_m4*sigma_mz2d_imp/(f_mzd*1000)
 
-## System
-st.subheader('System')
-col11, col22, col33, col44 = st.columns(4, gap="small")
-with col11:
-    st.latex("Effective Length")
-    st.latex(r"L_{ef}=L*\beta=" + str(l_ef) + r"m")
-    
-with col22:
-    st.latex("Reduction Factor")
-    st.latex(r"\chi=\frac{k_{mod}}{\gamma}=" + str("{:.2f}".format(chi)))
-    
-with col33:
-    st.latex("Predeformation")
-    st.latex(r"\theta=" + str(theta))
-    
-# Cross-sectional Parameters
-st.subheader('Cross-sectional Parameters') 
-col111, col222, col333, col444 = st.columns(4, gap="small")
-with col111:
-    st.latex("y-Axis")
-    st.latex(r"I_{y}=\frac{b*h^3}{12}=" + str("{:.4f}".format(I_y)) + r" m^4")
-    st.latex(r"w_{y}=\frac{b*h^2}{6}=" + str("{:.4f}".format(w_y)) + r" m^3")
-    st.latex(r"i_{y}=\frac{h}{\sqrt{12}}=" + str("{:.4f}".format(i_y)) + r" m^4")
-    
-with col222:
-    st.latex("z-Axis")
-    st.latex(r"I_{z}=\frac{h*b^3}{12}=" + str("{:.4f}".format(I_z)) + r" m^4")
-    st.latex(r"w_{z}=\frac{h*b^2}{6}=" + str("{:.4f}".format(w_z)) + r" m^3")
-    st.latex(r"i_{z}=\frac{b}{\sqrt{12}}=" + str("{:.4f}".format(i_z)) + r" m^4")
+tab1, tab2 = st.tabs(["Summary", "Detailed"])
 
-with col333:
-    st.latex("Strengths")
-    st.latex(r"f_{c0d}=f_{c0k}*\chi=" + str("{:.1f}".format(f_c0d)) + r" N/mm^2")
-    st.latex(r"f_{myd}=f_{mzd}=f_{myk}*\chi=" + str("{:.1f}".format(f_myd)) + r" N/mm^2")
-    st.latex(r"E_{0meand}=E_{0mean}*\chi=" + str("{:.1f}".format(E_0meand)) + r" N/mm^2")
-
-# First Order Theory
-st.subheader('First Order Theory') 
-st.write("DIN EN 1995-1-1 Abs- 5.4.3")
-col1111, col2222, col3333, col4444 = st.columns(4, gap="small")
-with col1111:
-    e_0 = l_ef*theta    # m   
-    st.latex(r"e_{0}=L_{ef}*\theta=" + str("{:+.4f}".format(e_0)) + r" m")
-  
-with col2222:
-    M_0 = e_0*N_ed    # kNm
-    st.latex(r"M_{0}=e_{0}*N_{ed}=" + str("{:+.1f}".format(M_0)) + r" kNm")
- 
-
-# Tables
-## Erstellen eines Dictionaries
-st.subheader('Second Order Theory') 
-
-col1111, col2222 = st.columns(2, gap="medium")
-with col1111:
-    # input
-    direction = ['y-Axis (Imperfetion)', 'z-Axis']
+with tab1:
     
-    for i,n in enumerate(range(2)):
-        # plotly table
-        table = create_st_table(direction[i], L_e, L_M, L_e_total, L_M_total, n)
+    ## Summary 
+    st.subheader('Result')
+    col1, col2, col3, col4 = st.columns(4, gap="small")
+    with col1:
+        st.latex("Utilization\ \eta_y=" + str((int(eta_y * 100+1))) + "\%")
+        st.progress(eta_y)
+    
+    with col3:
+        st.latex("Utilization\ \eta_z=" + str((int(eta_z * 100+1))) + "\%")
+        st.progress(eta_z)
         
-    #for i,n in enumerate(range(2)):
-    #    # plotly line chart
-    #    create_st_line_chart(direction, x, L_M_total, color, n)
-
-with col2222:
-    # input
-    direction = ['y-Axis', 'z-Axis (Imperfetion)']
+with tab2:       
     
-    for i,n in enumerate(range(2,4)):
-        # plotly table
-        table = create_st_table(direction[i], L_e, L_M, L_e_total, L_M_total, n)
+    ## System
+    st.subheader('System')
+    col11, col22, col33, col44 = st.columns(4, gap="small")
+    with col11:
+        st.latex("Effective\ Length")
+        st.latex(r"L_{ef}=L*\beta=" + str(l_ef) + r"m")
         
-    #for i,n in enumerate(range(2,4)):
-    #    # plotly line chart
-    #    create_st_line_chart(direction, x, L_M_total, color, n)
+    with col22:
+        st.latex("Reduction\ Factor")
+        st.latex(r"\chi=\frac{k_{mod}}{\gamma}=" + str("{:.2f}".format(chi)))
+        
+    with col33:
+        st.latex("Predeformation")
+        st.latex(r"\theta=" + str(theta))
+        
+    # Cross-sectional Parameters
+    st.subheader('Cross-sectional Parameters') 
+    col111, col222, col333, col444 = st.columns(4, gap="small")
+    with col111:
+        st.latex("y-Axis")
+        st.latex(r"I_{y}=\frac{b*h^3}{12}=" + str("{:.4f}".format(I_y)) + r" m^4")
+        st.latex(r"w_{y}=\frac{b*h^2}{6}=" + str("{:.4f}".format(w_y)) + r" m^3")
+        st.latex(r"i_{y}=\frac{h}{\sqrt{12}}=" + str("{:.4f}".format(i_y)) + r" m^4")
+        
+    with col222:
+        st.latex("z-Axis")
+        st.latex(r"I_{z}=\frac{h*b^3}{12}=" + str("{:.4f}".format(I_z)) + r" m^4")
+        st.latex(r"w_{z}=\frac{h*b^2}{6}=" + str("{:.4f}".format(w_z)) + r" m^3")
+        st.latex(r"i_{z}=\frac{b}{\sqrt{12}}=" + str("{:.4f}".format(i_z)) + r" m^4")
     
-# Results
-st.subheader('Results') 
-st.latex(r"\sigma_{cd}=\frac{N_{ed}}{A}=" + str("{:.2f}".format(sigma_cd/1000)) + r" N/mm^2")
-col11111, col22222 = st.columns(2, gap="medium")
-with col11111:
-    st.latex(r"e_{toty}=" + str("{:.2f}".format(L_e_total[0][-1])) + r" mm")
-    st.latex(r"M_{toty}=" + str("{:.2f}".format(L_M_total[0][-1])) + r" kNm")
-    st.latex(r"\sigma_{m2ydimp}=\frac{M_{totyd}}{w_y}=" + str("{:.2f}".format(sigma_myIId_imp/1000)) + r" N/mm^2")
-    st.latex(r"\sigma_{m2zd}=\frac{M_{2zd}}{w_z}=" + str("{:.2f}".format(sigma_mz2d/1000)) + r" N/mm^2")
-    st.latex(r"k_{m1}=" + str(k_m1))
-    st.latex(r"k_{m2}=" + str(k_m2))
-    st.latex(r"\eta_{y}=(\frac{\sigma_{cd}}{f_{cd0}})^2+k_{m1}*\frac{\sigma_{m2ydimp}}{f_{myd}}+k_{m2}*\frac{\sigma_{m2zd}}{f_{mzd}} = " + str("{:.2f}".format(eta_y)))
-
-   
-with col22222:
-    st.latex(r"e_{totz}=" + str("{:.2f}".format(L_e_total[1][-1])) + r" mm")
-    st.latex(r"M_{totz}=" + str("{:.2f}".format(L_M_total[1][-1])) + r" kNm")
-    st.latex(r"\sigma_{my2d}=\frac{M_{2yd}}{w_y}=" + str("{:.2f}".format(sigma_y2d/1000)) + r" N/mm^2")
-    st.latex(r"\sigma_{mz2dimp}=\frac{M_{totzd}}{w_z}=" + str("{:.2f}".format(sigma_mz2d_imp/1000)) + r" N/mm^2")
-    st.latex(r"k_{m1}=" + str(k_m3))
-    st.latex(r"k_{m2}=" + str(k_m4))
-    st.latex(r"\eta_{z}=(\frac{\sigma_{cd}}{f_{cd0}})^2+k_{m1}*\frac{\sigma_{mzd}}{f_{mzd}}+k_{m2}*\frac{\sigma_{m2zdimp}}{f_{mzd}} = " + str("{:.2f}".format(eta_z)))
+    with col333:
+        st.latex("Strengths")
+        st.latex(r"f_{c0d}=f_{c0k}*\chi=" + str("{:.1f}".format(f_c0d)) + r" N/mm^2")
+        st.latex(r"f_{myd}=f_{mzd}=f_{myk}*\chi=" + str("{:.1f}".format(f_myd)) + r" N/mm^2")
+        st.latex(r"E_{0meand}=E_{0mean}*\chi=" + str("{:.1f}".format(E_0meand)) + r" N/mm^2")
+    
+    # First Order Theory
+    st.subheader('First Order Theory') 
+    st.write("DIN EN 1995-1-1 Abs- 5.4.3")
+    col1111, col2222, col3333, col4444 = st.columns(4, gap="small")
+    with col1111:
+        e_0 = l_ef*theta    # m   
+        st.latex(r"e_{0}=L_{ef}*\theta=" + str("{:+.4f}".format(e_0)) + r" m")
+      
+    with col2222:
+        M_0 = e_0*N_ed    # kNm
+        st.latex(r"M_{0}=e_{0}*N_{ed}=" + str("{:+.1f}".format(M_0)) + r" kNm")
+     
+    
+    # Tables
+    ## Erstellen eines Dictionaries
+    st.subheader('Second Order Theory') 
+    
+    col1111, col2222, col3333, col4444 = st.columns(4, gap="medium")
+    with col1111:
+        # input
+        direction = ['y-Axis (Imperfetion)', 'z-Axis']
+        
+        for i,n in enumerate(range(2)):
+            # plotly table
+            table = create_st_table(direction[i], L_e, L_M, L_e_total, L_M_total, n)
+            
+        #for i,n in enumerate(range(2)):
+        #    # plotly line chart
+        #    create_st_line_chart(direction, x, L_M_total, color, n)
+    
+    with col3333:
+        # input
+        direction = ['y-Axis', 'z-Axis (Imperfetion)']
+        
+        for i,n in enumerate(range(2,4)):
+            # plotly table
+            table = create_st_table(direction[i], L_e, L_M, L_e_total, L_M_total, n)
+            
+        #for i,n in enumerate(range(2,4)):
+        #    # plotly line chart
+        #    create_st_line_chart(direction, x, L_M_total, color, n)
+        
+    # Results
+    st.subheader('Results') 
+    st.latex(r"\sigma_{cd}=\frac{N_{ed}}{A}=" + str("{:.2f}".format(sigma_cd/1000)) + r" N/mm^2")
+    col11111, col22222 = st.columns(2, gap="medium")
+    with col11111:
+        st.latex(r"e_{toty}=" + str("{:.2f}".format(L_e_total[0][-1])) + r" mm")
+        st.latex(r"M_{toty}=" + str("{:.2f}".format(L_M_total[0][-1])) + r" kNm")
+        st.latex(r"\sigma_{m2ydimp}=\frac{M_{totyd}}{w_y}=" + str("{:.2f}".format(sigma_myIId_imp/1000)) + r" N/mm^2")
+        st.latex(r"\sigma_{m2zd}=\frac{M_{2zd}}{w_z}=" + str("{:.2f}".format(sigma_mz2d/1000)) + r" N/mm^2")
+        st.latex(r"k_{m1}=" + str(k_m1))
+        st.latex(r"k_{m2}=" + str(k_m2))
+        st.latex(r"\eta_{y}=(\frac{\sigma_{cd}}{f_{cd0}})^2+k_{m1}*\frac{\sigma_{m2ydimp}}{f_{myd}}+k_{m2}*\frac{\sigma_{m2zd}}{f_{mzd}} = " + str("{:.2f}".format(eta_y)))
+    
+       
+    with col22222:
+        st.latex(r"e_{totz}=" + str("{:.2f}".format(L_e_total[1][-1])) + r" mm")
+        st.latex(r"M_{totz}=" + str("{:.2f}".format(L_M_total[1][-1])) + r" kNm")
+        st.latex(r"\sigma_{my2d}=\frac{M_{2yd}}{w_y}=" + str("{:.2f}".format(sigma_y2d/1000)) + r" N/mm^2")
+        st.latex(r"\sigma_{mz2dimp}=\frac{M_{totzd}}{w_z}=" + str("{:.2f}".format(sigma_mz2d_imp/1000)) + r" N/mm^2")
+        st.latex(r"k_{m1}=" + str(k_m3))
+        st.latex(r"k_{m2}=" + str(k_m4))
+        st.latex(r"\eta_{z}=(\frac{\sigma_{cd}}{f_{cd0}})^2+k_{m1}*\frac{\sigma_{mzd}}{f_{mzd}}+k_{m2}*\frac{\sigma_{m2zdimp}}{f_{mzd}} = " + str("{:.2f}".format(eta_z)))
